@@ -35,5 +35,9 @@ data_with_features <- merge(reshaped_main_data, featGlobal, by="featcode", all.x
 ##finding mean values by the subject and by activities as per the requirement.
 setkey(data_with_features, subjectnum, activitynum, activityname, featcode)
 dtMean <- data_with_features[,"mean_value":=mean(value),by=list(subjectnum,activitynum,featcode)][]
+dtMean$value <- NULL
+setkey(dtMean)
+dtMean <- unique(dtMean)
+setcolorder(dtMean,c(2,3,4,1,5,6,7))
 View(dtMean)
 write.table(dtMean,"meanData.txt",row.names = FALSE)

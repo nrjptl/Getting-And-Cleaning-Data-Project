@@ -21,11 +21,11 @@ ActivityNames <- DescriptiveActivities()
 ## Merging main_data with the activity details thus, main_data will contain 
 ## activity names.
 ## Setting the activity name as the key.
-main_data <- merge(main_data,ActivityNames,by = "activitynum", all.x = TRUE)
-setkey(main_data, subjectnum, activitynum, activityname)
+MeanStdData <- merge(MeanStdData,ActivityNames,by = "activitynum", all.x = TRUE)
+setkey(MeanStdData, subjectnum, activitynum, activityname)
 
 ## Reshaping the data using melt function.
-reshaped_main_data <- data.table(melt(main_data, key(main_data), variable.name="featcode"))
+reshaped_main_data <- data.table(melt(MeanStdData, key(MeanStdData), variable.name="featcode"))
 ## Merging feature name details with the reshaped data.
 ## Thus, reshaped data contains feature name.
 data_with_features <- merge(reshaped_main_data, featGlobal, by="featcode", all.x=TRUE)
@@ -36,8 +36,12 @@ data_with_features <- merge(reshaped_main_data, featGlobal, by="featcode", all.x
 setkey(data_with_features, subjectnum, activitynum, activityname, featcode)
 dtMean <- data_with_features[,"mean_value":=mean(value),by=list(subjectnum,activitynum,featcode)][]
 dtMean$value <- NULL
+dtMean$featcode <- NULL
 setkey(dtMean)
 dtMean <- unique(dtMean)
-setcolorder(dtMean,c(2,3,4,1,5,6,7))
+## Viewing the table
 View(dtMean)
+## Writing it to the txt file.
 write.table(dtMean,"meanData.txt",row.names = FALSE)
+## length(unique(dtMean$featname)) * length(unique(dtMean$activityname)) * length(unique(dtMean$subjectnum))
+## is equals to nrow(dtMean)
